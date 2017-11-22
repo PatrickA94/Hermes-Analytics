@@ -19,8 +19,8 @@ CsrfProtect(app)
 db = connection.Connection()
 
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+@app.route('/search', methods=['GET', 'POST'])
+def search():
     class SelectTeamForm(FlaskForm):
         models = db.get_models()
         memory = db.get_memory()
@@ -42,13 +42,13 @@ def index():
         session['MODEL'] = form.model.data
         print("WAS HERE")
         session['MEMORY'] = form.mem.data
-        return redirect('/player')
+        return redirect('/results')
 
-    return render_template("index.html", form=form)
+    return render_template("search.html", form=form)
 
 
-@app.route('/player', methods=['GET','POST'])
-def player():
+@app.route('/results', methods=['GET','POST'])
+def results():
 
     model = session['MODEL']
     memory = session['MEMORY']
@@ -57,12 +57,9 @@ def player():
     items = pd.read_json(items)
     items.set_index(['TITLE'],inplace=True)
     items['URL'] =items["URL"].apply('<a href="{0}">{0}</a>'.format)
-
-
-    #items["URL"] = items["URL"]
     items.index.name=None
 
-    return render_template("player.html", tables=[items.to_html()])
+    return render_template("results.html", tables=[items.to_html()])
 
 
 @app.route('/stats', methods=['POST', 'GET'])

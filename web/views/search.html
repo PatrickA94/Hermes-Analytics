@@ -17,7 +17,7 @@
             <span class="card-title white-text">Select a Team</span>
             <div class="row">
               <div class="input-field col s6">
-              <form class="form-horizontal" action="{{ url_for('index') }}" method="POST">
+              <form class="form-horizontal" action="{{ url_for('search') }}" method="POST">
                     <fieldset>
                         {{ form.csrf_token }}
                         {{ form.model }}

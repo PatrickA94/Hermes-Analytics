@@ -1,13 +1,23 @@
 import psycopg2
 import datetime
-from psycopg2.extensions import QuotedString
+from psycopg2.extras import RealDictCursor
+
 
 class Connection:
     def __init__(self):
         con = psycopg2.connect(database='hermes', user='django', host='localhost', password='hermes')
         self.cur = con.cursor()
+        self.dict = con.cursor(cursor_factory = RealDictCursor)
         self.commit = con.commit
         self.roll = con.rollback
+
+    def get_models(self):
+        self.cur.execute('select Distinct "MODEL","MODEL" from products ')
+        return self.cur.fetchall()
+
+    def get_memory(self):
+        self.cur.execute('select distinct "MEMORY","MEMORY" from products where "MEMORY" is NOT NULL')
+        return self.cur.fetchall()
 
     def most_sold24(self):
         now = datetime.datetime.today()
@@ -41,8 +51,8 @@ class Connection:
 
 
     def get_phones(self,model_type,memory):
-        self.cur.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products where "MODEL"=%s and "MEMORY"=%s', [model_type,memory])
-        return self.cur.fetchall()
+        self.dict.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products where "MODEL"=%s and "MEMORY"=%s', [model_type,memory])
+        return self.dict.fetchall()
 
     def get_users(self):
         self.cur.execute('select "NAME", "EMAIL" from customers')

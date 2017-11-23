@@ -1,0 +1,15 @@
+<!doctype html>
+<title>Simple tables</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class=page>
+  <h1>Surfer groups</h1>
+  <p>table 1 is greatest difference of purchase price and sell price </p>
+  <p>table 2 is the greatest difference of purchase price and sell price over time ratio </p>
+
+  {% for table in tables %}
+    {{ table|safe }}
+  {% endfor %}
+
+
+
+</div>

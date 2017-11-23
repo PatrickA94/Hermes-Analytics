@@ -7,7 +7,7 @@ from psycopg2.extras import RealDictCursor
 
 class Connection:
     def __init__(self):
-        con = psycopg2.connect(database='hermes', user='django', host='localhost', password='hermes')
+        con = psycopg2.connect(database='hermes', user='flask', host='localhost', password='root')
         self.cur = con.cursor()
         self.dict = con.cursor(cursor_factory = RealDictCursor)
         self.commit = con.commit
@@ -92,7 +92,7 @@ class Connection:
                          'where purchases."CUST_ID" = customers."CUST_ID"')
         return self.dict.fetchall()
 
-    def users_trans(self,email):
+    def users_trans2(self,email):
         self.dict.execute('select "SALE_AMOUNT","DATE_SOLD","PURCHASE_AMOUNT","DATE_BOUGHT","SHIPPING","NAME" '
                          'from customers, purchases '
                          'where purchases."CUST_ID"=customers."CUST_ID" and purchases."CUST_ID"= ( '
@@ -100,6 +100,21 @@ class Connection:
                             'from customers  '
                             'where "EMAIL" = %s)',[email])
         return self.dict.fetchall()
+
+
+    def users_trans(self,email):
+        self.dict.execute('select "SALE_AMOUNT","DATE_SOLD","PURCHASE_AMOUNT","DATE_BOUGHT","SHIPPING","NAME","PLATFORM", "MODEL" '
+                         'from customers '
+                          'INNER JOIN purchases on customers."CUST_ID" = purchases."CUST_ID" '
+                          'INNER JOIN products on purchases."ITEM_ID" = products."ITEM_ID" '
+                         'where purchases."CUST_ID"= ( '
+                            'select "CUST_ID" '
+                            'from customers  '
+                            'where "EMAIL" = %s)',[email])
+        return self.dict.fetchall()
+
+
+
     def biggest_gains(self):
         self.dict.execute('select "CUST_ID","ITEM_ID",("SALE_AMOUNT"-"PURCHASE_AMOUNT") as profit '
                          'from purchases '

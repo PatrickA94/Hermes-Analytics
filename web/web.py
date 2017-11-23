@@ -17,9 +17,10 @@ CsrfProtect(app)
 # create connection object and get data for teams and players
 db = connection.Connection()
 
+# Index page displays the mostold phone for the day, phones under average price for model and the best deal
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    mostsold = db.most_sold24()
+    mostsold = db.most_sold24() # might display nothing if there is no data from today
     cheap_phones = db.phones_lta()
     bestdeal = db.bestdeal()
 
@@ -28,9 +29,9 @@ def index():
 
     return render_template("index.html", tables=[cheap_phones.to_html(),bestdeal.to_html()],mostsold=mostsold)
 
-
-@app.route('/search', methods=['GET', 'POST'])
-def search():
+# Page for searching items
+@app.route('/itemSearch', methods=['GET', 'POST'])
+def itemSearch():
     class SelectTeamForm(FlaskForm):
         models = db.get_models()
         memory = db.get_memory()
@@ -52,12 +53,12 @@ def search():
         session['MODEL'] = form.model.data
         print("WAS HERE")
         session['MEMORY'] = form.mem.data
-        return redirect('/results')
+        return redirect('/itemResults')
 
-    return render_template("search.html", form=form)
+    return render_template("itemSearch.html", form=form)
 
-
-@app.route('/results', methods=['GET','POST'])
+# Page that we got to after a itemSearch is submit and valid
+@app.route('/itemResults', methods=['GET','POST'])
 def results():
 
     model = session['MODEL']
@@ -65,26 +66,26 @@ def results():
     items = db.get_phones(model,memory)
     items = db.pandafy(items,"TITLE")
 
-    return render_template("results.html", tables=[items.to_html()])
+    return render_template("itemResults.html", tables=[items.to_html()])
 
-
+# Page that displays all the users
 @app.route('/users', methods=['GET','POST'])
 def users():
     users = db.get_users()
     users = db.pandafy(users,"NAME")
-    return render_template("results.html", tables=[users.to_html()])
+    return render_template("users.html", tables=[users.to_html()])
 
-
+# Page that displays all active users
 @app.route('/active', methods=['GET','POST'])
 def active():
     users = db.get_active_users()
     try:users = db.pandafy(users,"NAME")
     except: return abort(404)
-    return render_template("results.html", tables=[users.to_html()])
+    return render_template("active.html", tables=[users.to_html()])
 
-
-@app.route('/transearch', methods=['GET','POST'])
-def transearch():
+# Page that lets us search transactions by email
+@app.route('/TransactionSearch', methods=['GET','POST'])
+def TransactionSearch():
     class SelectEmailForm(FlaskForm):
          emails = db.get_emails()
          email = SelectField(choices=emails)
@@ -102,22 +103,23 @@ def transearch():
     # handle post request in form
     if form2.validate_on_submit():
         session['EMAIL'] = form2.email.data
-        return redirect('/transresults')
+        return redirect('/transactionResults')
 
-    return render_template("searchtrans.html", form2=form2)
+    return render_template("TransactionSearch.html", form2=form2)
 
-@app.route('/transresults', methods=['GET','POST'])
-def transresults():
+# Page that displays the results of the previous page
+@app.route('/transactionResults', methods=['GET','POST'])
+def transactionResults():
 
     email = session['EMAIL']
     emails = db.users_trans(email)
     emails = db.pandafy(emails,"NAME")
 
-    return render_template("results.html", tables=[emails.to_html()])
+    return render_template("transactionResults.html", tables=[emails.to_html()])
 
-
-@app.route('/besttrans', methods=['POST','GET'])
-def besttrans():
+# Displays the best buys and returns
+@app.route('/bestBuys', methods=['POST','GET'])
+def bestBuys():
     gains = db.biggest_gains()
     gains = db.pandafy(gains,"CUST_ID")
 
@@ -125,18 +127,11 @@ def besttrans():
     returns = db.pandafy(returns,"ITEM_ID")
 
 
-    return render_template("results.html", tables= [gains.to_html(),returns.to_html()])
-
-
-@app.route('/stats', methods=['POST', 'GET'])
-def stats():
-    player_id = session['PLAYER_ID']
-    stats = db.get_stats(player_id)
-
-    return render_template("stats.html", name=stats[1], blocks=stats[9], drfgm=stats[11], drfga=stats[12], drfgpct=stats[13])
+    return render_template("bestBuys.html", tables= [gains.to_html(),returns.to_html()])
 
 
 
+'''
 # create simple api that takes in id and response with stats of said player
 # ex http://localhost:5000/api/201960
 # TODO add query parameters like http://localhost:5000/api?id=201960
@@ -145,6 +140,7 @@ def api(id):
     player_id = id
     stats = db.get_stats(player_id)
     return jsonify(stats)
+'''
 
 if __name__ == '__main__':
     app.run(debug=True, host='localhost')

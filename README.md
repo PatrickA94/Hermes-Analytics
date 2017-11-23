@@ -1,16 +1,21 @@
 # HermesV2
 Project repository with setup and usage instructions
 
+# TODO
+
+- Make sure we have all required VIEWS/QUERIES
+- Styling for webpages
+- Fake data for transactins
+- Make API with JSON output
+
 # Setup
 - [Linux](#linux-setup)
 - [Pycharm Setup](#pycharm-ide-setup)
 - [Running Project](#run-project)
-- [Additional Styling](#styling)
-- [Tasks to Complete For Lab](#complete)
+
 
 
 - Install [PostgreSQL](https://www.postgresql.org/download/windows/)
-- Install [pgAdmin3](https://www.pgadmin.org/download/windows.php)
 
 
 # Linux Setup
@@ -42,6 +47,11 @@ enter it again: root
 \q
 exit
 ```
+Use the provided file to set up the database 
+
+
+
+
 
 
 # PyCharm IDE Setup

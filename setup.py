@@ -5,8 +5,8 @@ except ImportError:
 
 config = {
     'description': 'db',
-    'author': 'Neil Seward',
-    'author_email': 'sealneaward@gmail.com',
+    'author': 'Patrick Andruszkiewicz',
+    'author_email': 'patrick.andruszkiewicz@uoit.net',
     'version': '0.0.1',
     'packages': find_packages(),
     'name': 'db'

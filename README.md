@@ -38,52 +38,32 @@ deactivate
 - run these commands in terminal
 ```
 sudo su postgres
-createuser root
-createdb hermes -O root
+createuser flask
+createdb hermes 
 psql
-\password root
+\password flask
 password: root
 enter it again: root
+grant all privileges on database hermes to flask;
 \q
 exit
 ```
-Use the provided file to set up the database 
+
+Run the python script called dbint.py in DB/schema/ directory, this will create the tables in the database.
+Then run the populate.py script to populate the database with the initial data
+
+### Flask Server Setup
+
+Run the web.py file, this will initilize the web server.
+Navigate to http://localhost:5000
 
 
-
-
-
-
-# PyCharm IDE Setup
-- download and install [PyCharm](https://www.jetbrains.com/pycharm/)
-- you can get a free license from JetBrains if you are a [student](https://www.jetbrains.com/student/)
-- to add your venv as an interpreter follow these [instructions](https://www.jetbrains.com/help/pycharm/2016.1/adding-existing-virtual-environment.html)
-
-![VENV Interpreter Setup](img/pycharm-venv.png)
-
-### PyCharm Debugging
-- click on the dropdown arrow ![Arrow](img/arrow.png) and select edit configurations
-- add a python configuration with the following settings
-
-**For Web Server**
-![Configuration Setup Web](img/web-config.png)
-
-**For Databse Population**
-![Configuration Setup Web](img/populate-config.png)
 
 # Run Project
 - use configurations created in PyCharm for `web.py` and `populate.py`
 - to run, click the green arrow button besides the dropdown used for configuration
 
-![Run](img/run.png)
-
-- to debug, click on the green sun icon
-
-![Debug](img/debug.png)
 
 **Note:** You can run the web and populate scripts on the command line if you ran the package installation on db.
-
-# Styling
-- I used Materialize.css for this project
 
 

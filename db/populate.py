@@ -14,20 +14,17 @@ class Populate:
         products = pd.read_pickle("kijijiphones.pickle")
         products.to_sql('products', con=self.engine, if_exists='append', index=False)
 
-        '''
-        
-        YOUR DATA WILL GO HERE AMAZON, EBAY AND TRANSACTION DATA
-        
+
         amazonProducts = pd.read_pickle("amazon.pickle")
-        amazonProducts.to_sql('amazonProducts', con=self.engine, if_exists='append', index=False)
+        amazonProducts.to_sql('products', con=self.engine, if_exists='append', index=False)
         
         ebayProducts = pd.read_pickle("ebayProducts.pickle")
-        ebayProducts.to_sql('ebayProducts', con=self.engine, if_exists='append', index=False)
+        ebayProducts.to_sql('products', con=self.engine, if_exists='append', index=False)
         
         purchase = pd.read_pickle("purchase.pickle")
-        purchase.to_sql('purchase', con=self.engine, if_exists='append', index=False)
+        purchase.to_sql('purchases', con=self.engine, if_exists='append', index=False)
         
-        '''
+
 
 
         #products = pd.read_pickle("/home/patrick/Documents/School/DBproj/Hermes/db/iphone8.pickle")

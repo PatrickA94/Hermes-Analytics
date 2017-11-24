@@ -15,21 +15,22 @@ CREATE TABLE "customers"
 -- Create model products
 --
 CREATE TABLE "products" 
-("ITEM_ID" varchar(30) NOT NULL PRIMARY KEY, 
-"DATE_POSTED" timestamp with time zone NOT NULL, 
-"PLATFORM" varchar(20) NOT NULL, 
-"CARRIER" varchar(20) NOT NULL, 
-"MODEL" varchar(30) NOT NULL, 
-"MEMORY" smallint NULL, 
-"LATITUDE" numeric(9, 3) NOT NULL, 
-"LONGITUDE" numeric(9, 3) NOT NULL, 
-"ADDRESS" text NOT NULL, 
-"DESCRIPTION" text NOT NULL, 
-"POSTER_ID" integer NOT NULL, 
-"PRICE" numeric(10, 2) NOT NULL, 
-"TITLE" text NOT NULL, 
-"URL" varchar(200) NOT NULL, 
-"VISITS" smallint NULL);
+("ITEM_ID" varchar(50) NOT NULL PRIMARY KEY,
+"DATE_POSTED" timestamp with time zone NULL,
+"PLATFORM" varchar(20) NOT NULL,
+"CARRIER" varchar(20) NOT NULL,
+"MODEL" varchar(60) NOT NULL,
+"MEMORY" smallint NULL,
+"LATITUDE" numeric(9, 3) NULL,
+"LONGITUDE" numeric(9, 3) NULL,
+"ADDRESS" text NULL,
+"DESCRIPTION" text NULL,
+"POSTER_ID" varchar(60) NULL,
+"PRICE" numeric(10, 2) NOT NULL,
+"TITLE" text NOT NULL,
+"URL" varchar(200) NOT  NULL,
+"VISITS" smallint NULL,
+"SHIPPING" numeric(10, 2) NULL);
 --
 -- Create model purchases
 --

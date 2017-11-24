@@ -48,7 +48,7 @@ grant all privileges on database hermes to flask;
 \q
 exit
 ```
-
+Before running the scripts below, ensure you are in the virtual enviroment
 Run the python script called dbint.py in DB/schema/ directory, this will create the tables in the database.
 Then run the populate.py script to populate the database with the initial data
 

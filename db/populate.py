@@ -18,6 +18,15 @@ class Populate:
         
         YOUR DATA WILL GO HERE AMAZON, EBAY AND TRANSACTION DATA
         
+        amazonProducts = pd.read_pickle("amazon.pickle")
+        amazonProducts.to_sql('amazonProducts', con=self.engine, if_exists='append', index=False)
+        
+        ebayProducts = pd.read_pickle("ebayProducts.pickle")
+        ebayProducts.to_sql('ebayProducts', con=self.engine, if_exists='append', index=False)
+        
+        purchase = pd.read_pickle("purchase.pickle")
+        purchase.to_sql('purchase', con=self.engine, if_exists='append', index=False)
+        
         '''
 
 

@@ -6,21 +6,22 @@ class Populate:
     def __init__(self):
         self.engine = create_engine('postgresql://flask:root@localhost:5432/hermes')
 
-    def populate(self):
-        products = pd.read_pickle("kijijiphones.pickle")
+    def populate(self, itemdict):
+        products = pd.read_pickle(itemdict['kijiji'])
         products.to_sql('products', con=self.engine, if_exists='append', index=False)
 
-        ebayProducts = pd.read_pickle("ebayProducts.pickle")
+        ebayProducts = pd.read_pickle(itemdict['ebay'])
         ebayProducts.to_sql('products', con=self.engine, if_exists='append', index=False)
 
-        amazonProducts = pd.read_pickle("amazonProducts.pickle")
+        amazonProducts = pd.read_pickle(itemdict['amazon'])
         amazonProducts.to_sql('products', con=self.engine, if_exists='append', index=False)
 
-        customers = pd.read_pickle("MOCK_DATA-1.pickle")
+        customers = pd.read_pickle(itemdict['customers'])
         customers.to_sql('customers',con=self.engine, if_exists='append', index=False)
 
-        purchase = pd.read_pickle("purchase.pickle")
+        purchase = pd.read_pickle(itemdict['purchases'])
         purchase.to_sql('purchases', con=self.engine, if_exists='append', index=False)
 
-populate = Populate()
-populate.populate()
+def main(item):
+    populate = Populate()
+    populate.populate(item)

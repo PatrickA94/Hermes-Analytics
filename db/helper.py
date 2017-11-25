@@ -13,6 +13,11 @@ class Connection:
         self.commit = con.commit
         self.roll = con.rollback
 
+    '''
+    def catFilter(self):
+        self.cur.execute('select "MODEL" from products where "MODEL"  = ANY ( sele"MODEL" from products where "MODEL" LIKE 'iphone%'or "MODEL" LIKE 'samsung%')")
+    
+    '''
     def get_emails(self):
         self.cur.execute('select "EMAIL","EMAIL" from customers order by "EMAIL" ASC')
         return self.cur.fetchall()
@@ -32,7 +37,7 @@ class Connection:
         return self.cur.fetchone()
 
     def phones_lta(self):
-        self.dict.execute('select products."MODEL",products."PRICE",products."URL" '
+        self.dict.execute('select products."MODEL",products."PRICE",products."TITLE", products."TITLE", products."CARRIER", products."PLATFORM" '
                          'from products '
                          'INNER JOIN (select "MODEL", avg("PRICE") as "PRICE" '
                                     'from products '
@@ -41,7 +46,7 @@ class Connection:
                          'where products."PRICE"< phoneav."PRICE"')
         return self.dict.fetchall()
     def bestdeal(self):
-        self.dict.execute('select products."MODEL",products."PRICE",products."URL",(products."PRICE"-phoneav."PRICE") as dif '
+        self.dict.execute('select products."MODEL",products."PRICE",products."TITLE",products."MEMORY",(products."PRICE"-phoneav."PRICE") as dif '
                          'from products '
                          'INNER JOIN (select "MODEL", avg("PRICE") as "PRICE" '
                                     'from products '
@@ -86,6 +91,8 @@ class Connection:
             self.roll()
             print("Failure")
 
+
+#Improve this by linking more tables and getting more information
     def get_active_users(self):
         self.dict.execute('select "NAME","EMAIL" '
                          'from customers, purchases '
@@ -114,18 +121,18 @@ class Connection:
         return self.dict.fetchall()
 
 
-
+# Show which customer this was
     def biggest_gains(self):
         self.dict.execute('select "CUST_ID","ITEM_ID",("SALE_AMOUNT"-"PURCHASE_AMOUNT") as profit '
                          'from purchases '
                          'where "SALE_AMOUNT" is NOT NULL '
                          'order by profit DESC ')
         return self.dict.fetchall()
-
+# Show which product it was 
     def weakly_returns(self):
-        self.dict.execute('select purchases."ITEM_ID", hot.gain '
+        self.dict.execute('select purchases."ITEM_ID",purchases."", hot.gain '
                          'from purchases '
-                         'INNER JOIN (select "ITEM_ID",("SALE_AMOUNT"-"PURCHASE_AMOUNT")/(extract(minute from "DATE_SOLD"-"DATE_BOUGHT")/(60*24*7)) as gain '
+                         'INNER JOIN (select "ITEM_ID",("SALE_AMOUNT"-"PURCHASE_AMOUNT")/nullif(extract(minute from "DATE_SOLD"-"DATE_BOUGHT")/(60*24*7),0) as gain '
                             'from purchases where "SALE_AMOUNT" is NOT NULL order by gain DESC) as hot '
                          'ON purchases."ITEM_ID"=hot."ITEM_ID" '
                          'ORDER by hot.gain DESC')

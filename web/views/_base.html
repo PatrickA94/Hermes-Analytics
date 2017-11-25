@@ -6,13 +6,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hermes</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+    
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+
     <link rel="stylesheet" href="{{ url_for("static", filename="css/override.css") }}"><link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     <link rel="icon" type="image/png" href="{{ url_for("static", filename="img/nba.png") }}">
 </head>
+
+
+<body>
+
+<div class="nav-wrapper">
+	<ul>
+	<li><a href="/">homepage</a></li>
+	<li><a href="/active">Active users</a></li>
+	<li><a href="/bestBuys">Best Buys</a></li>
+	<li><a href="/browse">Browse</a></li>
+	<li><a href="/users">Users</a></li>
+	<li><a href="/itemSearch">Item Search</a></li>	
+	<li><a href="/PurchaseSubmission">Purchase submission</a></li>
+	<li><a href="/saleSubmission">Sale Submisson</a></li>
+	</ul>
+      <!--a class="white-text brand-logo" href="/">Hermes</a><a href="users ">users</a><a href="itemSearch ">itemSearch</a-->
+   </div>
+
+
 
 {% block content %}
 
 
 {% endblock %}
-
+</body>
 </html>

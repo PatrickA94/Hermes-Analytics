@@ -1,46 +1,16 @@
 {% extends "_base.html" %}
 
 {% block content %}
-<body>
-  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
-  <nav class="purple darken-2">
-    <div class="nav-wrapper">
-      <a class="white-text brand-logo" href="/">Hermes</a><br>
-      <a href="/browse">browse</a>
-      <a href="/search">Seach</a>
-    </div>
-  </nav>
-  <div class="container">
-    <div class="row">
-      <div class="col s12">
-        <div class="card purple">
-          <div class="card-content">
-            <span class="card-title white-text">Select phone model</span>
-            <div class="row">
-              <div class="input-field col s6">
-              <form class="form-horizontal" action="{{ url_for('index') }}" method="POST">
-                    <fieldset>
-                        {{ form.csrf_token }}
-                        {{ form.name() }}
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-success">
-                                Get Players
-                            </button>
-                        </div>
-                    </fieldset>
-                </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <script>
-  $(document).ready(function () {
-    $('select').material_select();
-});
-</script>
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class=page>
+  <h1>Item results</h1>
+<div class="table-striped">
+  <p>This table shows all the values for the products</p>
+  {% for table in tables %}
+    {{ table|safe }}
+  {% endfor %}
 </div>
-</body>
+</div>
+
 {% endblock %}

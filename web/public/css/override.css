@@ -9,3 +9,25 @@ option:disabled,.dropdown-content li>a, .dropdown-content li>span {
 .btn, .btn-large {
     background-color: rebeccapurple;
 }
+
+.container{
+background-color: #c785db;
+border: 50px
+}
+
+.outer{
+background-color: #ae35d6;
+}
+
+
+li{
+float: left;
+}
+
+li a{
+display: block;
+color:white;
+text-align:center;
+padding:14px 16px;
+text-decoration:none;
+}

@@ -1,18 +1,12 @@
 <!doctype html>
-<title>Simple tables</title>
+
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
   <h1>Trending Deals</h1>
   <p>This table shows table the most sold model in the last 24 hours</p>
+<div class="table-striped">
   {% for table in tables %}
     {{ table|safe }}
   {% endfor %}
-  <p>This table shows a list of models with a price less than the average price for that model</p>
-  {% for table in tables %}
-    {{ table|safe }}
-  {% endfor %}
-  <p>This table shows the specific item with the most negative difference from the average</p>
-  {% for table in tables %}
-    {{ table|safe }}
-  {% endfor %}
+</div>
 </div>

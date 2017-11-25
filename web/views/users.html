@@ -1,10 +1,25 @@
-<!doctype html>
-<title>Simple tables</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+{% extends "_base.html" %}
+
+{% block content %}
+
+<div class="outer">
+<div class="container">
+<!--link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}"-->
+<nav class="purple darken-2">
+    
+  </nav>
 <div class=page>
   <h1>Users</h1>
   <p>This table shows all the users unconditionally</p>
+
+
+<div class="table-striped">
   {% for table in tables %}
     {{ table|safe }}
   {% endfor %}
 </div>
+
+</div>
+</div>
+</div>
+{% endblock %}

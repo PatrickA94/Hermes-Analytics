@@ -13,12 +13,13 @@
             <span class="card-title white-text">Select item parameters</span>
             <div class="row">
               <div class="input-field col s6">
-              <form class="form-horizontal" action="{{ url_for('search') }}" method="POST">
+              <form class="form-horizontal" action="{{ url_for('saleSubmission') }}" method="POST">
                     <fieldset>
                         {{ form.csrf_token }}
-                        <input type="text" name="email" value="email">
-                        <input type="text" name="link" value="link">
-                        <input type="date" name="buydate" value="buydate" min="2000-01-01" max="2017-12-12">
+                        Pick Item Number
+                        {{ form.item }}
+                        How much did you sell for
+                        {{ form.price }}
                         <div class="form-group">
                             <button type="submit" class="btn btn-success">
                                 Get Players

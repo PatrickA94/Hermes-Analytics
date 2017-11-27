@@ -52,4 +52,5 @@ CREATE INDEX "purchases_CUST_ID_6aec3a9f" ON "purchases" ("CUST_ID");
 CREATE INDEX "purchases_CUST_ID_6aec3a9f_like" ON "purchases" ("CUST_ID" varchar_pattern_ops);
 CREATE INDEX "purchases_ITEM_ID_f31bf070" ON "purchases" ("ITEM_ID");
 CREATE INDEX "purchases_ITEM_ID_f31bf070_like" ON "purchases" ("ITEM_ID" varchar_pattern_ops);
+ALTER SEQUENCE "purchases_TRANS_ID_seq" RESTART WITH 100;
 COMMIT;

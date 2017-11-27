@@ -7,6 +7,7 @@
   <p>table 2 is the greatest difference of purchase price and sell price over time ratio </p>
 
   {% for table in tables %}
+    <h2>{{titles[loop.index]}}</h2>
     {{ table|safe }}
   {% endfor %}
 

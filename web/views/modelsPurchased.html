@@ -1,0 +1,11 @@
+<!doctype html>
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class=page>
+  <h1>Models users have purchased but still awaiting sale</h1>
+<div class="table-striped">
+  {% for table in data %}
+    {{ table|safe }}
+  {% endfor %}
+</div>
+</div>

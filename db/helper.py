@@ -13,11 +13,8 @@ class Connection:
         self.commit = con.commit
         self.roll = con.rollback
 
-    '''
-    def catFilter(self):
-        self.cur.execute('select "MODEL" from products where "MODEL"  = ANY ( sele"MODEL" from products where "MODEL" LIKE 'iphone%'or "MODEL" LIKE 'samsung%')")
-    
-    '''
+    # HELPER QUERIES
+
     def get_emails(self):
         self.cur.execute('select "EMAIL","EMAIL" from customers order by "EMAIL" ASC')
         return self.cur.fetchall()
@@ -26,25 +23,47 @@ class Connection:
         self.cur.execute('select Distinct "MODEL","MODEL" from products ')
         return self.cur.fetchall()
 
-    def get_memory(self):
-        self.cur.execute('select distinct "MEMORY","MEMORY" from products where "MEMORY" is NOT NULL')
+    def get_itemno(self):
+        self.cur.execute(' select "ITEM_ID","ITEM_ID" from products')
         return self.cur.fetchall()
+
+    def get_itemno_sell(self):
+        self.cur.execute('select "ITEM_ID", "ITEM_ID" from purchases where "SALE_AMOUNT" is NULL ')
+        return self.cur.fetchall()
+
+    def get_custID(self):
+        self.cur.execute('select "CUST_ID","NAME" from customers')
+        return self.cur.fetchall()
+
+    def get_memory_all(self):
+        self.cur.execute('select distinct "MEMORY","MEMORY" from products where "MEMORY" is NOT NULL' )
+        return self.cur.fetchall()
+
+    def get_memory(self,model):
+        self.cur.execute('select distinct "MEMORY" from products where "MEMORY" is NOT NULL and "MODEL"= %s;',(model,) )
+        return self.cur.fetchall()
+
+    def get_users(self):
+        self.dict.execute('select "NAME", "EMAIL" from customers')
+        return self.dict.fetchall()
+
+    def allproducts(self):
+        self.dict.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products order by "DATE_POSTED"')
+        return self.dict.fetchall()
+
+    # TRENDING and ANALYTICS
 
     def most_sold24(self):
         now = datetime.datetime.today()
-        #dayy = psycopg2.sql.Literal("day")
         self.cur.execute('select "MODEL" from products where extract(day from "DATE_POSTED") = %s;',(now.day,))
         return self.cur.fetchone()
 
-#	Select all models whose price is less than the global purchase average CORRELATED SUBQUERY
+    #	Select all models whose price is less than the global purchase average CORRELATED SUBQUERY 3
     def lower_than_global_avg(self):
-        self.cur.execute('SELECT p."MODEl", p."PRICE", p."URL"'
-		'FROM PRODUCTS AS p'
-		'WHERE p."PRICE" < (SELECT AVG(t."PURCHASE_AMOUNT") FROM purchases AS t WHERE p."ITEM_ID"= t."ITEM_ID"')
-        return self.cur.fetchone()
-
-
-
+        self.dict.execute('SELECT p."MODEL", p."PRICE", p."URL" '
+                        'FROM PRODUCTS AS p '
+                        'WHERE p."PRICE" < (SELECT AVG(t."PURCHASE_AMOUNT") FROM purchases AS t WHERE p."ITEM_ID"= t."ITEM_ID")')
+        return self.dict.fetchall()
 
     def phones_lta(self):
         self.dict.execute('select products."MODEL",products."PRICE",products."TITLE", products."TITLE", products."CARRIER", products."PLATFORM" '
@@ -66,17 +85,9 @@ class Connection:
                          'order by dif')
         return self.dict.fetchall()
 
-    def allproducts(self):
-        self.cur.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products order by "DATE_POSTED"')
-        return self.cur.fetchall()
-
 
     def get_phones(self,model_type,memory):
         self.dict.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products where "MODEL"=%s and "MEMORY"=%s', [model_type,memory])
-        return self.dict.fetchall()
-
-    def get_users(self):
-        self.dict.execute('select "NAME", "EMAIL" from customers')
         return self.dict.fetchall()
 
 
@@ -85,21 +96,21 @@ class Connection:
         try:
             self.cur.execute(sql,[amount,cust_id,item_id])
             self.commit()
-            print("Success")
+            return 1
         except:
             self.roll()
-            print("Failure")
+            return 0
 
 
-    def cust_sell(self,item_id,amount,cust_id):
-        sql = 'update purchases set "SALE_AMOUNT"= %s, "DATE_SOLD"=current_timestamp where "CUST_ID"=%s and "ITEM_ID"=%s'
+    def cust_sell(self,item_id,amount):
+        sql = 'update purchases set "SALE_AMOUNT"= %s, "DATE_SOLD"=current_timestamp where "ITEM_ID"=%s'
         try:
-            self.cur.execute(sql,[amount,cust_id,item_id])
+            self.cur.execute(sql,[amount,item_id])
             self.commit()
-            print("Success")
+            return 1
         except:
             self.roll()
-            print("Failure")
+            return 0
 
 
 #	Improve this by linking more tables and getting more information
@@ -119,19 +130,21 @@ class Connection:
         return self.dict.fetchall()
 
 #	THIS SHOWS ALL USERS WITH THEIR ASSOCIATED PURCHASES for FULL JOIN view
+
     def users_with_transactions(self):
-        self.dict.execute('SELECT customers."NAME" , purchases."TRANS_ID"'
+        self.dict.execute('SELECT customers."NAME","PURCHASE_AMOUNT", "SALE_AMOUNT" , purchases."TRANS_ID" '
         'FROM customers FULL OUTER JOIN purchases ON customers."CUST_ID" = purchases."CUST_ID"')
-        return self.cur.fetchall()
+        return self.dict.fetchall()
 # this shows all the models that havent been bought yet for UNION EXCEPT or INTERSECT view 
-   def unbought_models(self):
-        self.dict.execute('SELECT products."MODEL" FROM products'
-			'EXCEPT(SELECT products."MODEL" FROM products , purchases WHERE products."ITEM_ID" = purchases."ITEM_ID")')
-        return self.cur.fetchall()
+
+    def unbought_models(self):
+        self.dict.execute('SELECT products."MODEL" FROM products '
+            'EXCEPT(SELECT products."MODEL" FROM products , purchases WHERE products."ITEM_ID" = purchases."ITEM_ID")')
+        return self.dict.fetchall()
 
 
     def users_trans(self,email):
-        self.dict.execute('select "SALE_AMOUNT","DATE_SOLD","PURCHASE_AMOUNT","DATE_BOUGHT","SHIPPING","NAME","PLATFORM", "MODEL" '
+        self.dict.execute('select "SALE_AMOUNT","DATE_SOLD","PURCHASE_AMOUNT","DATE_BOUGHT",products."SHIPPING","NAME","PLATFORM", "MODEL" '
                          'from customers '
                           'INNER JOIN purchases on customers."CUST_ID" = purchases."CUST_ID" '
                           'INNER JOIN products on purchases."ITEM_ID" = products."ITEM_ID" '
@@ -142,23 +155,34 @@ class Connection:
         return self.dict.fetchall()
 
 
-# Show which customer this was
+# VIEW 1 : Covers 3 tables
     def biggest_gains(self):
-        self.dict.execute('select "CUST_ID","ITEM_ID",("SALE_AMOUNT"-"PURCHASE_AMOUNT") as profit '
-                         'from purchases '
-                         'where "SALE_AMOUNT" is NOT NULL '
+        self.dict.execute('select "NAME","MEMORY", "MODEL","PLATFORM",("SALE_AMOUNT"-"PURCHASE_AMOUNT") as profit '
+                         'from purchases, products,customers '
+                         'where "SALE_AMOUNT" is NOT NULL and purchases."ITEM_ID"=products."ITEM_ID" and purchases."CUST_ID"=customers."CUST_ID" '
                          'order by profit DESC ')
         return self.dict.fetchall()
 # Show which product it was 
     def weakly_returns(self):
-        self.dict.execute('select purchases."ITEM_ID",purchases."", hot.gain '
+        self.dict.execute('select "PLATFORM","MEMORY","NAME", "MODEL", hot.gain '
                          'from purchases '
-                         'INNER JOIN (select "ITEM_ID",("SALE_AMOUNT"-"PURCHASE_AMOUNT")/nullif(extract(minute from "DATE_SOLD"-"DATE_BOUGHT")/(60*24*7),0) as gain '
+                         'INNER JOIN (select "ITEM_ID",("SALE_AMOUNT"-"PURCHASE_AMOUNT")/nullif(extract(day from "DATE_SOLD"-"DATE_BOUGHT")/(7),0.0) as gain '
                             'from purchases where "SALE_AMOUNT" is NOT NULL order by gain DESC) as hot '
                          'ON purchases."ITEM_ID"=hot."ITEM_ID" '
+                        'INNER JOIN products on products."ITEM_ID"=purchases."ITEM_ID" '
+                        'INNER JOIN customers on customers."CUST_ID"=purchases."CUST_ID"  '
                          'ORDER by hot.gain DESC')
         return self.dict.fetchall()
 
+# VIEW 2 : NESTED query with ANY/ALL and group by
+    def purchased(self):
+        self.dict.execute(' select "MODEL",count("MODEL") from products '
+                          'where "ITEM_ID" = ANY '
+                          '( select "ITEM_ID" '
+                          'from purchases '
+                          'where "SALE_AMOUNT" is NULL) '
+                          'group by "MODEL";')
+        return self.dict.fetchall()
 
     def myconverter(self,o):
         if isinstance(o, datetime.datetime):
@@ -169,8 +193,6 @@ class Connection:
         pdata = simplejson.dumps(data, default=self.myconverter)
         pdata = pd.read_json(pdata)
         pdata.set_index([index],inplace=True)
-        try:pdata['URL'] =pdata["URL"].apply('<a href="{0}">{0}</a>'.format)
-        except: pass
         pdata.index.name=None
         return pdata
 

@@ -3,7 +3,7 @@
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
   <h1>Trending Deals</h1>
-  <p>This table shows table the most sold model in the last 24 hours</p>
+  <p>Phone under the average price of all phones</p>
 <div class="table-striped">
   {% for table in tables %}
     {{ table|safe }}

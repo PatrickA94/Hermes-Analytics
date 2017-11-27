@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, jsonify, url_for, request, s
 from flask_restful import Api
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CsrfProtect
-from wtforms import SelectField
+from wtforms import SelectField, DecimalField
 import db.helper as connection
 import pandas as pd
 pd.set_option('display.max_colwidth', -1)
@@ -27,14 +27,31 @@ def index():
     cheap_phones = db.pandafy(cheap_phones,"MODEL")
     bestdeal = db.pandafy(bestdeal,"MODEL")
 
-    return render_template("index.html", tables=[cheap_phones.to_html(),bestdeal.to_html()],mostsold=mostsold)
+    return render_template("index.html", tables=[cheap_phones.to_html(),bestdeal.to_html()],mostsold=mostsold,titles=["","Phones under model average","Best Deals"])
+
+
+@app.route('/phoneavg', methods=['GET', 'POST'])
+def phoneavg():
+    phone = db.lower_than_global_avg()
+    phone = db.pandafy(phone,"MODEL")
+
+    return render_template('trending.html', tables=[phone.to_html()])
+
+
+@app.route('/browse', methods=['GET', 'POST'])
+def browse():
+    allitems = db.allproducts()
+    allitems = db.pandafy(allitems,"MODEL")
+
+    return render_template('browse.html', tables=[allitems.to_html()])
+
 
 # Page for searching items
 @app.route('/itemSearch', methods=['GET', 'POST'])
 def itemSearch():
     class SelectTeamForm(FlaskForm):
         models = db.get_models()
-        memory = db.get_memory()
+        memory = db.get_memory_all()
         model = SelectField(choices=models)
         mem = SelectField(coerce=int,choices=memory)
 
@@ -64,7 +81,11 @@ def results():
     model = session['MODEL']
     memory = session['MEMORY']
     items = db.get_phones(model,memory)
-    items = db.pandafy(items,"TITLE")
+    try:items = db.pandafy(items,"ITEM_ID")
+    except:
+        propermem= db.get_memory(model)
+        return render_template("itemResultsErr.html",tables=[propermem])
+
 
     return render_template("itemResults.html", tables=[items.to_html()])
 
@@ -82,6 +103,13 @@ def active():
     try:users = db.pandafy(users,"NAME")
     except: return abort(404)
     return render_template("active.html", tables=[users.to_html()])
+
+@app.route('/detailedUser', methods = ['GET', 'POST'])
+def detailedUSer():
+    users = db.users_with_transactions()
+    users = db.pandafy(users,"NAME")
+
+    return render_template('users.html', tables=[users.to_html()])
 
 # Page that lets us search transactions by email
 @app.route('/TransactionSearch', methods=['GET','POST'])
@@ -113,21 +141,75 @@ def transactionResults():
 
     email = session['EMAIL']
     emails = db.users_trans(email)
-    emails = db.pandafy(emails,"NAME")
-
+    try: emails = db.pandafy(emails,"NAME")
+    except: abort(404)
     return render_template("transactionResults.html", tables=[emails.to_html()])
 
 # Displays the best buys and returns
 @app.route('/bestBuys', methods=['POST','GET'])
 def bestBuys():
     gains = db.biggest_gains()
-    gains = db.pandafy(gains,"CUST_ID")
+    gains = db.pandafy(gains,"NAME")
 
     returns = db.weakly_returns()
-    returns = db.pandafy(returns,"ITEM_ID")
+    returns = db.pandafy(returns,"NAME")
 
 
-    return render_template("bestBuys.html", tables= [gains.to_html(),returns.to_html()])
+    return render_template("bestBuys.html", tables= [gains.to_html(),returns.to_html()], titles=['',"Largest profits made","Profit to time ratio, selling faster is better"])
+
+@app.route('/PurchaseSubmission', methods = ['POST', 'GET'])
+def PurchaseSubmission():
+    class PurchaseSub(FlaskForm):
+        itemno = db.get_itemno()
+        custid = db.get_custID()
+        item = SelectField(label='ITEM NUMBER',choices=itemno)
+        cust = SelectField(label='CUSTOMER ID',choices=custid)
+        price = DecimalField(label='PRICE')
+    form = PurchaseSub()
+
+    print(form.errors)
+
+    # handle post request in form
+    if form.validate_on_submit():
+        stat = db.cust_buy(form.item.data,form.price.data,int(form.cust.data))
+        if stat == 1:
+            return render_template("error.html", stat = ["PURCHASE","SUCCESSFUL"])
+        else:
+            return render_template("error.html", stat = ["PURCHASE",'UNSUCCESSFUL'])
+    return render_template('PurchaseSubmission.html', form = form)
+
+@app.route('/saleSubmission', methods=['POST', 'GET'])
+def saleSubmission():
+        class saleSub(FlaskForm):
+            itemno = db.get_itemno_sell()
+            item = SelectField(label='ITEM NUMBER',choices=itemno)
+            price = DecimalField(label='PRICE')
+
+        form = saleSub()
+
+        print(form.errors)
+
+        if form.validate_on_submit():
+            stat = db.cust_sell(form.item.data,form.price.data)
+            if stat == 1:
+                return render_template("error.html", stat = ["SALE","SUCCESSFUL"])
+            else:
+                return render_template("error.html", stat = ["SALE",'UNSUCCESSFUL'])
+        return render_template('saleSubmission.html', form = form)
+
+@app.route('/modelsPurchased', methods=['POST', 'GET'])
+def modelsPurchased():
+    purch = db.purchased()
+    purch = db.pandafy(purch,"MODEL")
+
+    return render_template('modelsPurchased.html', data=[purch.to_html()])
+
+@app.route('/unboughtModels', methods=['POST', 'GET'])
+def unboughtModels():
+    notpurch = db.unbought_models()
+    notpurch = db.pandafy(notpurch,"MODEL")
+
+    return render_template('unboughtModels.html', data= [notpurch.to_html()])
 
 
 

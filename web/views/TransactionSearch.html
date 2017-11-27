@@ -16,7 +16,7 @@
               <form class="form-horizontal" action="{{ url_for('TransactionSearch') }}" method="POST">
                     <fieldset>
                         {{ form2.csrf_token }}
-                        <input type="text" placeholder="email" name="email">
+                        {{ form2.email }}
                         <div class="form-group">
                             <button type="submit" class="btn btn-success">
                                 Search Transactions

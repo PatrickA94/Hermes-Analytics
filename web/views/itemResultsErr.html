@@ -1,22 +1,18 @@
 {% extends "_base.html" %}
 
 {% block content %}
+<!--link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}"-->
 <div class="outer">
 <div class="container">
-<!--link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}"-->
 <div class=page>
+  <h1>There was a error with your search</h1>
+  <p>Try the same phone model but with one of these memory sizes</p>
 <div class="table-striped">
-  <h2>Most active phone today</h2>
-  {{ mostsold }}
   {% for table in tables %}
-  <h2>{{titles[loop.index]}}</h2>
     {{ table|safe }}
-
   {% endfor %}
 </div>
 </div>
 </div>
 </div>
-
-
 {% endblock %}

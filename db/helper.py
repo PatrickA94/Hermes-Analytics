@@ -36,6 +36,16 @@ class Connection:
         self.cur.execute('select "MODEL" from products where extract(day from "DATE_POSTED") = %s;',(now.day,))
         return self.cur.fetchone()
 
+#	Select all models whose price is less than the global purchase average CORRELATED SUBQUERY
+    def lower_than_global_avg(self):
+        self.cur.execute('SELECT p."MODEl", p."PRICE", p."URL"'
+		'FROM PRODUCTS AS p'
+		'WHERE p."PRICE" < (SELECT AVG(t."PURCHASE_AMOUNT") FROM purchases AS t WHERE p."ITEM_ID"= t."ITEM_ID"')
+        return self.cur.fetchone()
+
+
+
+
     def phones_lta(self):
         self.dict.execute('select products."MODEL",products."PRICE",products."TITLE", products."TITLE", products."CARRIER", products."PLATFORM" '
                          'from products '
@@ -92,7 +102,7 @@ class Connection:
             print("Failure")
 
 
-#Improve this by linking more tables and getting more information
+#	Improve this by linking more tables and getting more information
     def get_active_users(self):
         self.dict.execute('select "NAME","EMAIL" '
                          'from customers, purchases '
@@ -107,6 +117,17 @@ class Connection:
                             'from customers  '
                             'where "EMAIL" = %s)',[email])
         return self.dict.fetchall()
+
+#	THIS SHOWS ALL USERS WITH THEIR ASSOCIATED PURCHASES for FULL JOIN view
+    def users_with_transactions(self):
+        self.dict.execute('SELECT customers."NAME" , purchases."TRANS_ID"'
+        'FROM customers FULL OUTER JOIN purchases ON customers."CUST_ID" = purchases."CUST_ID"')
+        return self.cur.fetchall()
+# this shows all the models that havent been bought yet for UNION EXCEPT or INTERSECT view 
+   def unbought_models(self):
+        self.dict.execute('SELECT products."MODEL" FROM products'
+			'EXCEPT(SELECT products."MODEL" FROM products , purchases WHERE products."ITEM_ID" = purchases."ITEM_ID")')
+        return self.cur.fetchall()
 
 
     def users_trans(self,email):

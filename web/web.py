@@ -5,7 +5,7 @@ from flask_wtf.csrf import CsrfProtect
 from wtforms import SelectField, DecimalField
 import db.helper as connection
 import pandas as pd
-import gmplot
+#import gmplot
 import numpy as np
 pd.set_option('display.max_colwidth', -1)
 

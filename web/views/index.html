@@ -1,18 +1,21 @@
 {% extends "_base.html" %}
 
 {% block content %}
-<div class="outer">
+
 <div class="container">
-<!--link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}"-->
-<div class=page>
+<div >
 <div class="table-striped">
   <h2>Most active phone today</h2>
+<p>
   {{ mostsold }}
+</p>
+<div class="coral-bg">
+<table class="table-striped">
   {% for table in tables %}
   <h2>{{titles[loop.index]}}</h2>
-    {{ table|safe }}
-
+    <tr>{{ table|safe }}</tr>
   {% endfor %}
+</table>
 </div>
 </div>
 </div>

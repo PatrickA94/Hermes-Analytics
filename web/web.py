@@ -5,6 +5,8 @@ from flask_wtf.csrf import CsrfProtect
 from wtforms import SelectField, DecimalField
 import db.helper as connection
 import pandas as pd
+import gmplot
+import numpy as np
 pd.set_option('display.max_colwidth', -1)
 
 # initalize server
@@ -211,6 +213,19 @@ def unboughtModels():
 
     return render_template('unboughtModels.html', data= [notpurch.to_html()])
 
+@app.route('/heatmap', methods=['POST', 'GET'])
+def heatmap():
+
+    #longitude = db.get_long()
+    latitude = db.get_lat()
+
+    lat = np.asarray(latitude,dtype=float)
+
+    gmap = gmplot.GoogleMapPlotter.from_geocode("Toronto",7)
+    gmap.heatmap(lat[:,0],lat[:,1],radius=20, threshold=10, opacity=0.8, dissipating=True)
+    gmap.draw('views/mymap.html')
+
+    return render_template("mymap.html")
 
 
 '''

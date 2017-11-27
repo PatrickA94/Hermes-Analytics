@@ -51,6 +51,15 @@ class Connection:
         self.dict.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products order by "DATE_POSTED"')
         return self.dict.fetchall()
 
+    def get_lat(self):
+        self.cur.execute('select "LATITUDE","LONGITUDE" from products where "LATITUDE" is NOT NULL')
+        return self.cur.fetchall()
+
+    def get_long(self):
+        self.cur.execute('select "LONGITUDE" from products where "LONGITUDE" is NOT NULL')
+        return self.cur.fetchall()
+
+
     # TRENDING and ANALYTICS
 
     def most_sold24(self):

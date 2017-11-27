@@ -9,6 +9,7 @@ Flask-Cors==3.0.2
 Flask-RESTful==0.3.5
 Flask-Table==0.4.1
 Flask-WTF==0.13
+gmplot==1.2.0
 idna==2.6
 itsdangerous==0.24
 Jinja2==2.8

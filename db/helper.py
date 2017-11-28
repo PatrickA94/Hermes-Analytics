@@ -99,6 +99,10 @@ class Connection:
         self.dict.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products where "MODEL"=%s and "MEMORY"=%s', [model_type,memory])
         return self.dict.fetchall()
 
+    def get_phones_api(self,model_type):
+        self.dict.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products where "MODEL"=%s ', [model_type])
+        return self.dict.fetchall()
+
 
     def cust_buy(self,item_id,amount,cust_id):
         sql = 'insert into purchases ("PURCHASE_AMOUNT","DATE_BOUGHT","CUST_ID","ITEM_ID") values (%s,current_timestamp,%s,%s)'
@@ -202,6 +206,17 @@ class Connection:
         except:
             self.roll()
             return 0
+
+    def addItem(self,item_id,platform,carrier,model,memory,latitude,longitude,address,description,posted_id,price,title,url,visits,shipping):
+        sql = 'insert into products ("ITEM_ID","DATE_POSTED","PLATFORM","CARRIER","MODEL","MEMORY","LATITUDE","LONGITUDE","ADDRESS", "DESCRIPTION","POSTER_ID","PRICE","TITLE","URL","VISITS","SHIPPING") values (%s,current_timestamp,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+        try:
+            self.cur.execute(sql,[item_id,platform,carrier,model,memory,latitude,longitude,address,description,posted_id,price,title,url,visits,shipping])
+            self.commit()
+            return 1
+        except:
+            self.roll()
+            return 0
+
 
     def myconverter(self,o):
         if isinstance(o, datetime.datetime):

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, jsonify, url_for, request, session, abort
-from flask_restful import Api
+from flask_restful import Api, Resource
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CsrfProtect
 from wtforms import SelectField, DecimalField, StringField, PasswordField
@@ -11,9 +11,7 @@ pd.set_option('display.max_colwidth', -1)
 
 # initalize server
 app = Flask(__name__, template_folder='views', static_folder='public')
-api = Api(app)
 app.config['SECRET_KEY'] = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-CsrfProtect(app)
 
 
 # create connection object and get data for teams and players
@@ -250,16 +248,47 @@ def addCust():
     return render_template('newUser.html', form = form)
 
 
-'''
+
+
+
+
 # create simple api that takes in id and response with stats of said player
 # ex http://localhost:5000/api/201960
 # TODO add query parameters like http://localhost:5000/api?id=201960
-@app.route('/api/<id>', methods=['GET','POST'])
-def api(id):
-    player_id = id
-    stats = db.get_stats(player_id)
-    return jsonify(stats)
-'''
+@app.route('/api/get_phones/<model>', methods=['GET'])
+def get_phones(model):
+    phones = db.get_phones_api(model)
+    return jsonify(phones)
+
+@app.route('/api/addItem', methods=['POST'])
+def create_user():
+
+    item = {
+        'item_id': request.json['ITEM_ID'],
+        'platform': request.json['PLATFORM'],
+        'carrier': request.json['CARRIER'],
+        'model': request.json['MODEL'],
+        'memory': request.json.get('MEMORY',None),
+        'latitude': request.json.get("LATITUDE",None),
+        'longitude': request.json.get('LONGITUDE',None),
+        'address': request.json.get('ADDRESS',None),
+        'description': request.json.get('DESCRIPTION',None),
+        'poster_id': request.json.get('POSTER_ID',None),
+        'price': request.json['PRICE'],
+        'title': request.json['TITLE'],
+        'url': request.json['URL'],
+        'visits': request.json.get('VISITS', None),
+        'shipping': request.json.get('SHIPPING',None)
+    }
+
+    stat = db.addItem(item['item_id'],item['platform'],item['carrier'],item['model'],item['memory'],item['latitude'],
+                      item['longitude'],item['address'],item['description'],item['poster_id'],item['price'],item['title'],item['url'],item['visits'],item['shipping'])
+    if stat == 1:
+        return jsonify({'item': item}), 201
+    else:
+        return jsonify({'item': item}), 404
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='localhost')

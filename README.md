@@ -1,12 +1,6 @@
 # HermesV2
 Project repository with setup and usage instructions
 
-# TODO
-
-- Make sure we have all required VIEWS/QUERIES
-- Styling for webpages
-- Fake data for transactins
-- Make API with JSON output
 
 # Setup
 - [Linux](#linux-setup)

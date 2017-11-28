@@ -1,7 +1,5 @@
 from flask import Flask, render_template, redirect, jsonify, url_for, request, session, abort
-from flask_restful import Api, Resource
 from flask_wtf import FlaskForm
-from flask_wtf.csrf import CsrfProtect
 from wtforms import SelectField, DecimalField, StringField, PasswordField
 import db.helper as connection
 import pandas as pd
@@ -12,7 +10,6 @@ pd.set_option('display.max_colwidth', -1)
 # initalize server
 app = Flask(__name__, template_folder='views', static_folder='public')
 app.config['SECRET_KEY'] = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-
 
 # create connection object and get data for teams and players
 db = connection.Connection()
@@ -271,4 +268,4 @@ def create_user():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='localhost')
+    app.run(debug=False, host='localhost')

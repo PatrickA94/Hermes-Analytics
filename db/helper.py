@@ -18,7 +18,7 @@ class Connection:
     '''
 
     def get_emails(self):
-        self.cur.execute('select "EMAIL","EMAIL" from customers order by "EMAIL" ASC')
+        self.cur.execute('select "EMAIL","EMAIL" from customers, purchases where customers."CUST_ID"=purchases."CUST_ID" order by "EMAIL" ASC')
         return self.cur.fetchall()
 
     def get_models(self):
@@ -46,7 +46,7 @@ class Connection:
         return self.cur.fetchall()
 
     def get_users(self):
-        self.dict.execute('select "NAME", "EMAIL" from customers')
+        self.dict.execute('select distinct "NAME", "EMAIL" from customers')
         return self.dict.fetchall()
 
     def allproducts(self):

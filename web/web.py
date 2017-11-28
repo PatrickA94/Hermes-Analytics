@@ -2,10 +2,10 @@ from flask import Flask, render_template, redirect, jsonify, url_for, request, s
 from flask_restful import Api
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CsrfProtect
-from wtforms import SelectField, DecimalField
+from wtforms import SelectField, DecimalField, StringField, PasswordField
 import db.helper as connection
 import pandas as pd
-#import gmplot
+import gmplot
 import numpy as np
 pd.set_option('display.max_colwidth', -1)
 
@@ -226,6 +226,28 @@ def heatmap():
     gmap.draw('views/mymap.html')
 
     return render_template("mymap.html")
+
+@app.route('/addCust', methods=['POST', 'GET'])
+def addCust():
+    class Customer(FlaskForm):
+            cust_id = StringField()
+            name = StringField()
+            password = PasswordField()
+            email = StringField()
+            city = StringField()
+            street = StringField()
+            postal = StringField()
+    form = Customer()
+
+    print(form.errors)
+
+    if form.validate_on_submit():
+        stat = db.addCust(form.cust_id.data,form.name.data,form.password.data,form.email.data,form.city.data,form.street.data,form.postal.data)
+        if stat == 1:
+            return render_template("error.html", stat = ["NEW USER","SUCCESSFUL"])
+        else:
+            return render_template("error.html", stat = ["NEW USER",'UNSUCCESSFUL'])
+    return render_template('newUser.html', form = form)
 
 
 '''

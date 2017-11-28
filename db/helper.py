@@ -193,6 +193,16 @@ class Connection:
                           'group by "MODEL";')
         return self.dict.fetchall()
 
+    def addCust(self,cust_id,name,password,email,city,street,postal):
+        sql ='insert into customers ("CUST_ID","NAME", "PASS","DATE_JOINED", "EMAIL", "CITY", "STREET","POSTAL") values (%s,%s,%s,current_date,%s,%s,%s,%s)'
+        try:
+            self.cur.execute(sql,[cust_id,name,password,email,city,street,postal])
+            self.commit()
+            return 1
+        except:
+            self.roll()
+            return 0
+
     def myconverter(self,o):
         if isinstance(o, datetime.datetime):
             return o.__str__()
@@ -204,5 +214,3 @@ class Connection:
         pdata.set_index([index],inplace=True)
         pdata.index.name=None
         return pdata
-
-

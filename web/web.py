@@ -17,7 +17,7 @@ app.config['SECRET_KEY'] = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 # create connection object and get data for teams and players
 db = connection.Connection()
 
-# Index page displays the mostold phone for the day, phones under average price for model and the best deal
+# Index page displays the most sold phone for the day, phones under average price for model and the best deal
 @app.route('/', methods=['GET', 'POST'])
 def index():
     mostsold = db.most_sold24() # might display nothing if there is no data from today
@@ -29,7 +29,7 @@ def index():
 
     return render_template("index.html", tables=[cheap_phones.to_html(),bestdeal.to_html()],mostsold=mostsold,titles=["","Phones under model average","Best Deals"])
 
-
+# displays phone under the average price for all phones
 @app.route('/phoneavg', methods=['GET', 'POST'])
 def phoneavg():
     phone = db.lower_than_global_avg()
@@ -37,14 +37,13 @@ def phoneavg():
 
     return render_template('trending.html', tables=[phone.to_html()])
 
-
+# browse through all products in the database
 @app.route('/browse', methods=['GET', 'POST'])
 def browse():
     allitems = db.allproducts()
     allitems = db.pandafy(allitems,"MODEL")
 
     return render_template('browse.html', tables=[allitems.to_html()])
-
 
 # Page for searching items
 @app.route('/itemSearch', methods=['GET', 'POST'])
@@ -57,18 +56,11 @@ def itemSearch():
 
     form = SelectTeamForm()
 
-    if form.is_submitted():
-        print("Submitted")
-
-    if form.validate():
-        print("Valid")
-
     print(form.errors)
 
     # handle post request in form
     if form.validate_on_submit():
         session['MODEL'] = form.model.data
-        print("WAS HERE")
         session['MEMORY'] = form.mem.data
         return redirect('/itemResults')
 
@@ -81,12 +73,10 @@ def results():
     model = session['MODEL']
     memory = session['MEMORY']
     items = db.get_phones(model,memory)
-    try:items = db.pandafy(items,"ITEM_ID")
+    try:items = db.pandafy(items,"ITEM_ID") # I use try catch here in case the memory for the phone was not valid. Then display what are good values to use
     except:
         propermem= db.get_memory(model)
         return render_template("itemResultsErr.html",tables=[propermem])
-
-
     return render_template("itemResults.html", tables=[items.to_html()])
 
 # Page that displays all the users
@@ -103,12 +93,11 @@ def active():
     try:users = db.pandafy(users,"NAME")
     except: return abort(404)
     return render_template("active.html", tables=[users.to_html()])
-
+# Page displays detailed information about users
 @app.route('/detailedUser', methods = ['GET', 'POST'])
 def detailedUSer():
     users = db.users_with_transactions()
     users = db.pandafy(users,"NAME")
-
     return render_template('users.html', tables=[users.to_html()])
 
 # Page that lets us search transactions by email
@@ -119,13 +108,6 @@ def TransactionSearch():
          email = SelectField(choices=emails)
 
     form2 = SelectEmailForm()
-
-    if form2.is_submitted():
-        print("Submitted")
-
-    if form2.validate():
-        print("Valid")
-
     print(form2.errors)
 
     # handle post request in form
@@ -135,7 +117,7 @@ def TransactionSearch():
 
     return render_template("TransactionSearch.html", form2=form2)
 
-# Page that displays the results of the previous page
+# Page that displays the results of the transaction search page
 @app.route('/transactionResults', methods=['GET','POST'])
 def transactionResults():
 
@@ -145,7 +127,7 @@ def transactionResults():
     except: abort(404)
     return render_template("transactionResults.html", tables=[emails.to_html()])
 
-# Displays the best buys and returns
+# Displays the best buys and greatest weakly returns
 @app.route('/bestBuys', methods=['POST','GET'])
 def bestBuys():
     gains = db.biggest_gains()
@@ -154,9 +136,9 @@ def bestBuys():
     returns = db.weakly_returns()
     returns = db.pandafy(returns,"NAME")
 
-
     return render_template("bestBuys.html", tables= [gains.to_html(),returns.to_html()], titles=['',"Largest profits made","Profit to time ratio, selling faster is better"])
 
+# submit a purchase that a customer has made
 @app.route('/PurchaseSubmission', methods = ['POST', 'GET'])
 def PurchaseSubmission():
     class PurchaseSub(FlaskForm):
@@ -169,7 +151,7 @@ def PurchaseSubmission():
 
     print(form.errors)
 
-    # handle post request in form
+    # handle post request in form and displays a error page if a problem occurs
     if form.validate_on_submit():
         stat = db.cust_buy(form.item.data,form.price.data,int(form.cust.data))
         if stat == 1:
@@ -178,6 +160,7 @@ def PurchaseSubmission():
             return render_template("error.html", stat = ["PURCHASE",'UNSUCCESSFUL'])
     return render_template('PurchaseSubmission.html', form = form)
 
+#User can submit a sale they have made, only itemno are displayed since they are the KEY
 @app.route('/saleSubmission', methods=['POST', 'GET'])
 def saleSubmission():
         class saleSub(FlaskForm):
@@ -188,7 +171,7 @@ def saleSubmission():
         form = saleSub()
 
         print(form.errors)
-
+        # validates forms and redirects to a error page if there is a problem
         if form.validate_on_submit():
             stat = db.cust_sell(form.item.data,form.price.data)
             if stat == 1:
@@ -197,6 +180,7 @@ def saleSubmission():
                 return render_template("error.html", stat = ["SALE",'UNSUCCESSFUL'])
         return render_template('saleSubmission.html', form = form)
 
+# counts how many models are bought but not sold yet
 @app.route('/modelsPurchased', methods=['POST', 'GET'])
 def modelsPurchased():
     purch = db.purchased()
@@ -204,6 +188,7 @@ def modelsPurchased():
 
     return render_template('modelsPurchased.html', data=[purch.to_html()])
 
+# displays models that have not been bought by anyone yet
 @app.route('/unboughtModels', methods=['POST', 'GET'])
 def unboughtModels():
     notpurch = db.unbought_models()
@@ -211,20 +196,20 @@ def unboughtModels():
 
     return render_template('unboughtModels.html', data= [notpurch.to_html()])
 
+# displays a heatmap of where the products are
 @app.route('/heatmap', methods=['POST', 'GET'])
 def heatmap():
 
-    #longitude = db.get_long()
-    latitude = db.get_lat()
-
-    lat = np.asarray(latitude,dtype=float)
+    coridinate = db.get_coridinate()
+    cord = np.asarray(coridinate,dtype=float)
 
     gmap = gmplot.GoogleMapPlotter.from_geocode("Toronto",7)
-    gmap.heatmap(lat[:,0],lat[:,1],radius=20, threshold=10, opacity=0.8, dissipating=True)
+    gmap.heatmap(cord[:,0],cord[:,1],radius=20, threshold=10, opacity=0.8, dissipating=True)
     gmap.draw('views/mymap.html')
 
     return render_template("mymap.html")
 
+# Page for adding customers to the database
 @app.route('/addCust', methods=['POST', 'GET'])
 def addCust():
     class Customer(FlaskForm):
@@ -238,7 +223,7 @@ def addCust():
     form = Customer()
 
     print(form.errors)
-
+    # Checks if form is ok and goes to error page if there is a problem
     if form.validate_on_submit():
         stat = db.addCust(form.cust_id.data,form.name.data,form.password.data,form.email.data,form.city.data,form.street.data,form.postal.data)
         if stat == 1:
@@ -247,22 +232,17 @@ def addCust():
             return render_template("error.html", stat = ["NEW USER",'UNSUCCESSFUL'])
     return render_template('newUser.html', form = form)
 
-
-
-
-
-
-# create simple api that takes in id and response with stats of said player
-# ex http://localhost:5000/api/201960
-# TODO add query parameters like http://localhost:5000/api?id=201960
+# API for getting all phones of a desired model
 @app.route('/api/get_phones/<model>', methods=['GET'])
 def get_phones(model):
     phones = db.get_phones_api(model)
     return jsonify(phones)
-
+# REST api for creating a new user in the database,
 @app.route('/api/addItem', methods=['POST'])
 def create_user():
 
+    if not request.json or not 'ITEM_ID' in request.json:
+        abort(400)
     item = {
         'item_id': request.json['ITEM_ID'],
         'platform': request.json['PLATFORM'],

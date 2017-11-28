@@ -3,9 +3,10 @@ from sqlalchemy import create_engine
 
 
 class Populate:
+    # start the connection to the database
     def __init__(self):
         self.engine = create_engine('postgresql://flask:root@localhost:5432/hermes')
-
+    # fill the database with all the data we scraped and genrated
     def populate(self, itemdict):
         products = pd.read_pickle(itemdict['kijiji'])
         products.to_sql('products', con=self.engine, if_exists='append', index=False)

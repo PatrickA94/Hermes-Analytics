@@ -13,7 +13,9 @@ class Connection:
         self.commit = con.commit
         self.roll = con.rollback
 
-    # HELPER QUERIES
+    '''
+    The first section is basic queries used to populate drop downs and fill certain tables
+    '''
 
     def get_emails(self):
         self.cur.execute('select "EMAIL","EMAIL" from customers order by "EMAIL" ASC')
@@ -51,7 +53,7 @@ class Connection:
         self.dict.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products order by "DATE_POSTED"')
         return self.dict.fetchall()
 
-    def get_lat(self):
+    def get_coridinate(self):
         self.cur.execute('select "LATITUDE","LONGITUDE" from products where "LATITUDE" is NOT NULL')
         return self.cur.fetchall()
 
@@ -59,9 +61,12 @@ class Connection:
         self.cur.execute('select "LONGITUDE" from products where "LONGITUDE" is NOT NULL')
         return self.cur.fetchall()
 
+    def get_phones(self,model_type,memory):
+        self.dict.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products where "MODEL"=%s and "MEMORY"=%s', [model_type,memory])
+        return self.dict.fetchall()
 
-    # TRENDING and ANALYTICS
 
+    # Returns the most sold phone in the last 24 hours/ can return nothing if the database is stale
     def most_sold24(self):
         now = datetime.datetime.today()
         self.cur.execute('select "MODEL" from products where extract(day from "DATE_POSTED") = %s;',(now.day,))
@@ -74,6 +79,7 @@ class Connection:
                         'WHERE p."PRICE" < (SELECT AVG(t."PURCHASE_AMOUNT") FROM purchases AS t WHERE p."ITEM_ID"= t."ITEM_ID")')
         return self.dict.fetchall()
 
+    # Finds all phones that are less then there MODEL average
     def phones_lta(self):
         self.dict.execute('select products."MODEL",products."PRICE",products."TITLE", products."TITLE", products."CARRIER", products."PLATFORM" '
                          'from products '
@@ -83,6 +89,7 @@ class Connection:
                          'on products."MODEL"=phoneav."MODEL"'
                          'where products."PRICE"< phoneav."PRICE"')
         return self.dict.fetchall()
+    # finds the best deals are quantified by finding products with the biggest price differnce when compared to average price
     def bestdeal(self):
         self.dict.execute('select products."MODEL",products."PRICE",products."TITLE",products."MEMORY",(products."PRICE"-phoneav."PRICE") as dif '
                          'from products '
@@ -94,16 +101,12 @@ class Connection:
                          'order by dif')
         return self.dict.fetchall()
 
-
-    def get_phones(self,model_type,memory):
-        self.dict.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products where "MODEL"=%s and "MEMORY"=%s', [model_type,memory])
-        return self.dict.fetchall()
-
+    # Returns all of phones of a certain model, this one is for the json api
     def get_phones_api(self,model_type):
         self.dict.execute('select "ITEM_ID","PLATFORM","CARRIER", "MODEL", "MEMORY","PRICE","TITLE","URL" from products where "MODEL"=%s ', [model_type])
         return self.dict.fetchall()
 
-
+    # Insert a customers purchase into the table
     def cust_buy(self,item_id,amount,cust_id):
         sql = 'insert into purchases ("PURCHASE_AMOUNT","DATE_BOUGHT","CUST_ID","ITEM_ID") values (%s,current_timestamp,%s,%s)'
         try:
@@ -114,7 +117,7 @@ class Connection:
             self.roll()
             return 0
 
-
+    # Insert a customers sale into the table
     def cust_sell(self,item_id,amount):
         sql = 'update purchases set "SALE_AMOUNT"= %s, "DATE_SOLD"=current_timestamp where "ITEM_ID"=%s'
         try:
@@ -126,13 +129,13 @@ class Connection:
             return 0
 
 
-#	Improve this by linking more tables and getting more information
+    # Get users with atleast one purchase
     def get_active_users(self):
-        self.dict.execute('select "NAME","EMAIL" '
+        self.dict.execute('select "NAME","EMAIL", "DATE_JOINED", "CITY" '
                          'from customers, purchases '
                          'where purchases."CUST_ID" = customers."CUST_ID"')
         return self.dict.fetchall()
-
+    # get a users transactions using the email
     def users_trans2(self,email):
         self.dict.execute('select "SALE_AMOUNT","DATE_SOLD","PURCHASE_AMOUNT","DATE_BOUGHT","SHIPPING","NAME" '
                          'from customers, purchases '
@@ -142,20 +145,19 @@ class Connection:
                             'where "EMAIL" = %s)',[email])
         return self.dict.fetchall()
 
-#	THIS SHOWS ALL USERS WITH THEIR ASSOCIATED PURCHASES for FULL JOIN view
-
+    #	THIS SHOWS ALL USERS WITH THEIR ASSOCIATED PURCHASES for FULL JOIN view
     def users_with_transactions(self):
         self.dict.execute('SELECT customers."NAME","PURCHASE_AMOUNT", "SALE_AMOUNT" , purchases."TRANS_ID" '
         'FROM customers FULL OUTER JOIN purchases ON customers."CUST_ID" = purchases."CUST_ID"')
         return self.dict.fetchall()
-# this shows all the models that havent been bought yet for UNION EXCEPT or INTERSECT view 
 
+    # this shows all the models that havent been bought yet for UNION EXCEPT or INTERSECT view
     def unbought_models(self):
         self.dict.execute('SELECT products."MODEL" FROM products '
             'EXCEPT(SELECT products."MODEL" FROM products , purchases WHERE products."ITEM_ID" = purchases."ITEM_ID")')
         return self.dict.fetchall()
 
-
+    # get a users transactions using the email, this one uses joins instead of from
     def users_trans(self,email):
         self.dict.execute('select "SALE_AMOUNT","DATE_SOLD","PURCHASE_AMOUNT","DATE_BOUGHT",products."SHIPPING","NAME","PLATFORM", "MODEL" '
                          'from customers '
@@ -168,14 +170,14 @@ class Connection:
         return self.dict.fetchall()
 
 
-# VIEW 1 : Covers 3 tables
+    # VIEW 1 : Covers 3 tables, gets the phones with the highest profits
     def biggest_gains(self):
         self.dict.execute('select "NAME","MEMORY", "MODEL","PLATFORM",("SALE_AMOUNT"-"PURCHASE_AMOUNT") as profit '
                          'from purchases, products,customers '
                          'where "SALE_AMOUNT" is NOT NULL and purchases."ITEM_ID"=products."ITEM_ID" and purchases."CUST_ID"=customers."CUST_ID" '
                          'order by profit DESC ')
         return self.dict.fetchall()
-# Show which product it was 
+    # Show which product had the greatest dollar gain / week
     def weakly_returns(self):
         self.dict.execute('select "PLATFORM","MEMORY","NAME", "MODEL", hot.gain '
                          'from purchases '
@@ -187,7 +189,7 @@ class Connection:
                          'ORDER by hot.gain DESC')
         return self.dict.fetchall()
 
-# VIEW 2 : NESTED query with ANY/ALL and group by
+    # VIEW 2 : NESTED query with ANY/ALL and group by, counts how many models are bought but not sold yet
     def purchased(self):
         self.dict.execute(' select "MODEL",count("MODEL") from products '
                           'where "ITEM_ID" = ANY '
@@ -196,7 +198,7 @@ class Connection:
                           'where "SALE_AMOUNT" is NULL) '
                           'group by "MODEL";')
         return self.dict.fetchall()
-
+    # used for adding customers to the database
     def addCust(self,cust_id,name,password,email,city,street,postal):
         sql ='insert into customers ("CUST_ID","NAME", "PASS","DATE_JOINED", "EMAIL", "CITY", "STREET","POSTAL") values (%s,%s,%s,current_date,%s,%s,%s,%s)'
         try:
@@ -206,7 +208,7 @@ class Connection:
         except:
             self.roll()
             return 0
-
+    # used for adding items to database
     def addItem(self,item_id,platform,carrier,model,memory,latitude,longitude,address,description,posted_id,price,title,url,visits,shipping):
         sql = 'insert into products ("ITEM_ID","DATE_POSTED","PLATFORM","CARRIER","MODEL","MEMORY","LATITUDE","LONGITUDE","ADDRESS", "DESCRIPTION","POSTER_ID","PRICE","TITLE","URL","VISITS","SHIPPING") values (%s,current_timestamp,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
         try:
@@ -217,12 +219,12 @@ class Connection:
             self.roll()
             return 0
 
-
+    # used to handle datetime formats
     def myconverter(self,o):
         if isinstance(o, datetime.datetime):
             return o.__str__()
 
-
+    # takes the database output and puts it into a nicer format for displaying
     def pandafy(self,data,index):
         pdata = simplejson.dumps(data, default=self.myconverter)
         pdata = pd.read_json(pdata)

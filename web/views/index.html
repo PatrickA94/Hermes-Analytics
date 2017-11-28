@@ -3,21 +3,17 @@
 {% block content %}
 
 <div class="container">
-<div >
 <div class="table-striped">
-  <h2>Most active phone today</h2>
-<p>
+  <h1>Most active phone today:</h1>
+<h2>
   {{ mostsold }}
-</p>
-<div class="coral-bg">
+</h2>
 <table class="table-striped">
   {% for table in tables %}
   <h2>{{titles[loop.index]}}</h2>
     <tr>{{ table|safe }}</tr>
   {% endfor %}
 </table>
-</div>
-</div>
 </div>
 </div>
 

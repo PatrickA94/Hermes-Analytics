@@ -1,6 +1,7 @@
-<!doctype html>
+{% extends "_base.html" %}
 
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+{% block content %}
+<div class="container">
 <div class=page>
   <h1>Models with low interest</h1>
 <div class="table-striped">
@@ -9,3 +10,5 @@
   {% endfor %}
 </div>
 </div>
+</div>
+{% endblock %}

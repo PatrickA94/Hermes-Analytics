@@ -1,6 +1,7 @@
-<!doctype html>
+{% extends "_base.html" %}
 
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+{% block content %}
+<div class="container">
 <div class=page>
   <h1>Trending Deals</h1>
   <p>Phone under the average price of all phones</p>
@@ -10,3 +11,5 @@
   {% endfor %}
 </div>
 </div>
+</div>
+{% endblock %}

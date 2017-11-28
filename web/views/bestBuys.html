@@ -1,8 +1,9 @@
-<!doctype html>
+{% extends "_base.html" %}
 
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+{% block content %}
+<div class="container">
 <div class=page>
-  <h1>Surfer groups</h1>
+  <h1>Best Deals</h1>
   <p>table 1 is greatest difference of purchase price and sell price </p>
   <p>table 2 is the greatest difference of purchase price and sell price over time ratio </p>
 
@@ -10,7 +11,6 @@
     <h2>{{titles[loop.index]}}</h2>
     {{ table|safe }}
   {% endfor %}
-
-
-
 </div>
+</div>
+{% endblock %}

@@ -1,3 +1,7 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
 <html>
 <head>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
@@ -1969,7 +1973,9 @@ new google.maps.LatLng(43.780211, -79.415968),
 new google.maps.LatLng(43.736569, -79.254806),
 new google.maps.LatLng(42.981072, -81.264875),
 new google.maps.LatLng(42.429788, -82.186998),
-new google.maps.LatLng(43.706748, -79.594054),
+new google.maps.LatLng(43.706748, -79.594054),{% extends "_base.html" %}
+
+{% block content %}
 new google.maps.LatLng(43.734089, -79.713520),
 new google.maps.LatLng(42.991819, -79.271094),
 new google.maps.LatLng(43.591065, -79.630209),
@@ -2000,3 +2006,5 @@ heatmap.set('dissipating', true);
 	<div id="map_canvas" style="width: 100%; height: 100%;"></div>
 </body>
 </html>
+
+{% endblock %}

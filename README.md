@@ -58,7 +58,7 @@ To grab a json of all phones of a certain model use:
 ```
 http://localhost:5000/api/get_phones/<model>
 ```
-Where <model> gets replaced with a phone model i.e. (iphone6, samsungs8, iphonex....)
+Where `<model>` gets replaced with a phone model i.e. (iphone6, samsungs8, iphonex....)
   
 To add a new phone to the database use:
 ```

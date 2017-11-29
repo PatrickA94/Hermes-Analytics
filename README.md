@@ -5,10 +5,6 @@ Project repository with setup and usage instructions
 # Setup
 - [Linux](#linux-setup)
 - [Pycharm Setup](#pycharm-ide-setup)
-- [Running Project](#run-project)
-
-
-
 - Install [PostgreSQL](https://www.postgresql.org/download/windows/)
 
 
@@ -28,7 +24,7 @@ python setup.py install
 deactivate
 ```
 
-### PostgreSQL Database Setup
+## PostgreSQL Database Setup
 - run these commands in terminal
 ```
 sudo su postgres
@@ -48,7 +44,7 @@ python main.py
 ```
 
 
-### Flask Server Setup
+## Flask Server Setup
 
 Run the web.py file, this will initilize the web server.
 Navigate to http://localhost:5000
@@ -84,12 +80,20 @@ The body of the request should be a json with the layout below:
         'shipping': request.json.get('SHIPPING',None)
 }
 ```
+# Web Scrapers
+They are here for reference they are not integrated into our project, but used to get data and populate the database
+### Kijiji Scraper
+To run the kijiji scraper run this in terminal to get the usage instructions and values to pass
+```
+python kijiji-scraper.py -h
+```
+The output file requires cleaning after since kijiji is filled with ads so run to get the usage instructions and values to pass
+```
+python adscrubber.py -h
+```
+### Amazon Scraper
+
+### eBay Scraper
   
-# Run Project
-- use configurations created in PyCharm for `web.py` and `populate.py`
-- to run, click the green arrow button besides the dropdown used for configuration
-
-
-**Note:** You can run the web and populate scripts on the command line if you ran the package installation on db.
 
 

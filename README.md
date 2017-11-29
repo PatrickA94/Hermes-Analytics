@@ -94,6 +94,6 @@ python adscrubber.py -h
 ### Amazon Scraper
 To run the scraper either run it in your IDE of choice or run ./amazon_scraper_v3.py in terminal(note that you have to be in the same directory the file is in). A json file with the data will be created in the same directory as the script.
 ### eBay Scraper
-  
+Run the `eBay.py` file, result will output to `eBay-Scraped-Data.json`.
 
 

@@ -92,7 +92,7 @@ The output file requires cleaning after since kijiji is filled with ads so run t
 python adscrubber.py -h
 ```
 ### Amazon Scraper
-To run the scraper either run it in your IDE of choice or run ./amazonScraperv3.py in terminal(note that you have to be in the same directory the file is in). A json file with the data will be created in the same directory as the script.
+To run the scraper either run it in your IDE of choice or run ./amazon_scraper_v3.py in terminal(note that you have to be in the same directory the file is in). A json file with the data will be created in the same directory as the script.
 ### eBay Scraper
   
 

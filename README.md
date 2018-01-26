@@ -1,5 +1,6 @@
 # HermesV2
 Project repository with setup and usage instructions
+Goal of project was to make a web app to that scrapes data from Kijiji, Amazon and Ebay, and then do analysis on this data to get insight on what items could we do arbitrage on. 
 
 
 # Setup
